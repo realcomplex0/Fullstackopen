@@ -1,0 +1,24 @@
+{
+  "notes": [
+    {
+      "id": 1,
+      "content": "HTML is very easy",
+      "important": false
+    },
+    {
+      "id": 2,
+      "content": "Browser can execute only JavaScript",
+      "important": true
+    },
+    {
+      "content": "SUZHOU",
+      "important": true,
+      "id": 4
+    },
+    {
+      "content": "SUZHOU",
+      "important": true,
+      "id": 5
+    }
+  ]
+}
