@@ -20,18 +20,26 @@ const Footer = () => {
 }
 
 const App = () => {
-  const [notes, setNotes] = useState([])
-  const [newNote, setNewNote] = useState('SUZHOU')
+  const [notes, setNotes] = useState()
+  const [newNote, setNewNote] = useState('...')
   const [showAll, setShowAll] = useState(true)
-  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [errorMessage, setErrorMessage] = useState()
 
+  
   useEffect(() => {
-    noteService.getAll()
-    .then(newNotes => {setNotes(newNotes)})
+    noteService.getAll(setErrorMessage)
+    .then(newNotes => {
+      setNotes(newNotes)
+    })
   }, [])
+  
+  const validNotes = () => {
+    if(notes) return notes
+    else return []
+  }
 
-  const notesToShow = showAll ? notes : (
-    notes.filter((note) => {
+  const notesToShow = showAll ? validNotes() : (
+    validNotes().filter((note) => {
       if(note.important === true)
         return true
       else
@@ -57,7 +65,6 @@ const App = () => {
         }));
       }) 
     .catch(error => {
-        console.log('caught this one')
         setErrorMessage(`Note ${curNote.content} was DELETED`)
         setTimeout(() => {
             setErrorMessage(null)

@@ -1,4 +1,6 @@
 /part1/test
 /part2/test
 /part2/countries/.env
+/part3/phonebook_backend/.env
 /part3/test/node_modules
+/part3/test/.env

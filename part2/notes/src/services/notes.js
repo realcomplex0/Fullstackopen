@@ -1,11 +1,12 @@
 import axios from 'axios'
 const baseUrl = '/api/notes'
 
-const getAll = () => {
+const getAll = (setErrorMessage) => {
     return axios.get(baseUrl)
     .then(response => response.data)
     .catch(error => {
-        console.log('caught this bitch: ', error);
+        setErrorMessage('Something went wrong...')
+        setTimeout(() => {setErrorMessage(null)}, 5000)
     })
 }
 
