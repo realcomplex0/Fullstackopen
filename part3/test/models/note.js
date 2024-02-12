@@ -25,4 +25,6 @@ noteSchema.set('toJSON', {
   }
 })
 
+console.log('Model is launched')
+
 module.exports = mongoose.model('Note', noteSchema)

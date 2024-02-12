@@ -3,6 +3,8 @@ const express = require('express')
 const cors = require('cors')
 const Note = require('./models/note')
 
+console.log('Launch Backend')
+
 let notes = [
   {
     id: 1,
