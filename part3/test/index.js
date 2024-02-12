@@ -3,8 +3,6 @@ const express = require('express')
 const cors = require('cors')
 const Note = require('./models/note')
 
-console.log('Launch Backend')
-
 let notes = [
   {
     id: 1,
@@ -59,7 +57,6 @@ app.get('/', (request, response) => {
 
 app.get('/api/notes/', (request, response) => {
   Note.find({}).then(results => {
-    console.log('Request made: ', results)
     response.json(results)
   })  
 })
@@ -67,7 +64,6 @@ app.get('/api/notes/', (request, response) => {
 app.get('/api/notes/:id', (request, response) => {
   const id = Number(request.params.id)
   const note = notes.find(note => note.id === id)
-  console.log('Query: ', id)
   if (note){
     response.json(note)
   }
@@ -79,7 +75,6 @@ app.get('/api/notes/:id', (request, response) => {
 app.put('/api/notes/:id', (request, response) => {
   const newNotes = request.body
   const id = Number(request.params.id)
-  console.log(newNotes)
   const res = notes.map((note) => {
     if(note.id == id){
       return newNotes;
