@@ -57,6 +57,7 @@ app.get('/', (request, response) => {
 
 app.get('/api/notes/', (request, response) => {
   Note.find({}).then(results => {
+    console.log('Request made: ', results)
     response.json(results)
   })  
 })

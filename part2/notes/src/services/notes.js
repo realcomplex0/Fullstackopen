@@ -3,7 +3,11 @@ const baseUrl = '/api/notes'
 
 const getAll = (setErrorMessage) => {
     return axios.get(baseUrl)
-    .then(response => response.data)
+    .then(response => {
+            console.log(response.data)
+            return response.data
+        }
+    )
     .catch(error => {
         setErrorMessage('Something went wrong...')
         setTimeout(() => {setErrorMessage(null)}, 5000)
