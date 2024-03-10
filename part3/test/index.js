@@ -42,13 +42,13 @@ app.post('/api/notes', (request, response) => {
     })
   }
   console.log(body)
-  const note = {
-    id: genId(),
+  const note = new Note({
     content: body.content,
     important: Boolean(body.important)
-  }
-  notes = notes.concat(note)
-  response.json(note)
+  })
+  note.save().then(savedNote => {
+    response.json(savedNote)
+  })
 })
 
 app.get('/', (request, response) => {
@@ -62,14 +62,13 @@ app.get('/api/notes/', (request, response) => {
 })
 
 app.get('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const note = notes.find(note => note.id === id)
-  if (note){
+  const id = request.params.id
+  Note.findById(id).then(note => {
     response.json(note)
-  }
-  else{
-    response.status(404).end()
-  }
+  })
+  .catch(err => {
+    response.status(400).end()
+  })
 })
 
 app.put('/api/notes/:id', (request, response) => {
