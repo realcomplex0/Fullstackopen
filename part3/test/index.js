@@ -33,7 +33,7 @@ const genId = () => {
   return notes.length > 0 ? Math.max(...notes.map(n => n.id)) + 1 : 1
 }
 
-app.post('/api/notes', (request, response) => {
+app.post('/api/notes', (request, response, next) => {
   const body = request.body
   console.log(request.headers)
   if(!body.content){
@@ -49,6 +49,7 @@ app.post('/api/notes', (request, response) => {
   note.save().then(savedNote => {
     response.json(savedNote)
   })
+  .catch(err => next(err))
 })
 
 app.get('/', (request, response) => {
@@ -61,39 +62,53 @@ app.get('/api/notes/', (request, response) => {
   })  
 })
 
-app.get('/api/notes/:id', (request, response) => {
+app.get('/api/notes/:id', (request, response, next) => {
   const id = request.params.id
   Note.findById(id).then(note => {
-    response.json(note)
-  })
-  .catch(err => {
-    response.status(400).end()
-  })
-})
-
-app.put('/api/notes/:id', (request, response) => {
-  const newNotes = request.body
-  const id = Number(request.params.id)
-  const res = notes.map((note) => {
-    if(note.id == id){
-      return newNotes;
+    if(note){
+      response.json(note)
     }
     else{
-      return note;
+      response.status(404).end()
     }
   })
-  notes = res;
-  response.json(newNotes)
+  .catch(err => next(err)
+    // console.log(err)
+    // response.status(400).send({error: 'malformatted id'})
+  )
 })
 
-app.delete('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id)
-  notes = notes.filter(note => note.id !== id)
-  
-  response.status(204).end()
+app.put('/api/notes/:id', (request, response, next) => {
+  const {content, important} = request.body
+  Note.findByIdAndUpdate(request.params.id, {content, important}, { new: true, runValidators: true, context: 'query'})
+    .then(updatedNote => {
+      response.json(updatedNote)
+    }) 
+    .catch(err => next(err))
 })
+
+app.delete('/api/notes/:id', (request, response, next) => {
+  Note.findByIdAndDelete(request.params.id)
+    .then(result => {
+      response.status(204).end();
+    })
+    .catch(err => next(err))
+})
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if(error.name === 'CastError'){
+    return response.status(400).send({ error: 'malformatted id'})
+  }
+  else if(error.name === 'ValidationError'){
+    return response.status(400).json({ error: error.message })
+  }
+}
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
+
+app.use(errorHandler)

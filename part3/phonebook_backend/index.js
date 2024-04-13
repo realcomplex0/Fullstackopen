@@ -46,25 +46,47 @@ app.get('/api/persons', (request, response) => {
 
 app.get('/api/persons/:idx', (request, response) => {
     const index = request.params.idx
-    const person = people.find(p => p.id == index)
-    if(person){
-        response.json(person)
+    Person.findById(index).then(person => {
+        if(person){
+            response.json(person)
+        }
+        else{
+            response.status(404).end()
+        }
+    })
+    .catch(err => next(err))
+})
+
+app.put('/api/persons/:id', (request, response) => {
+    const index = request.params.id
+    const body = request.body
+    console.log(body)
+    const newPerson = {
+        name: body.name,
+        number: body.number,
     }
-    else{
-        response.status(404).end()
-    }
+    Person.findByIdAndUpdate(index, newPerson, { new: true})
+        .then(nPerson => {
+            response.json(nPerson)
+        })
+        .catch(err => next(err))
 })
 
 app.get('/info', (request, response) => {
     console.log(request.headers)
-    response.send(`<p>Phonebook has info for ${people.length} people</p> <p>${new Date()}</p>`)
+    Person.countDocuments({}).then(count => {
+        response.send(`<p>Phonebook has info for ${count} people</p> <p>${new Date()}</p>`)
+    })
+    .catch(err => next(err))
 })
 
-app.delete('/api/persons/:idx', (request, response) => {
+app.delete('/api/persons/:idx', (request, response, next) => {
     const index = request.params.idx
-    people = people.filter(p => p.id != index)
-    console.log(people)
-    response.status(204).end()
+    Person.findByIdAndDelete(index)
+    .then(result => {
+        response.status(204).end();
+    })
+    .catch(err => next(err));
 })
 
 const rand_id = () => {
@@ -76,23 +98,26 @@ app.post('/api/persons', (request, response) => {
     if(!data.name || !data.number){
         return response.status(400).end()
     }
-    const another = people.find(p => p.name.toLowerCase() == data.name.toLowerCase())
-    if(another){
-        return response.status(400).json({
-            error: 'name is not unique'
-        })
-    }
-    const new_person = {
-        id: rand_id(),
+    const person = new Person({
         name: data.name,
         number: data.number
-    }
-    people.push(new_person)
-    console.log(people)
-    response.json(new_person)
+    })
+    person.save().then(nPerson => {
+        response.json(nPerson)
+    })
 })
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+  
+    if(error.name === 'CastError'){
+      return response.status(400).send({ error: 'Bad ID'})
+    }
+  }
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server listening on PORT ${PORT}`)
 })
+
+app.use(errorHandler)
