@@ -14,32 +14,8 @@ morgan.token('body', (request, response) => {
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-let people = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
-
 app.get('/api/persons', (request, response) => {
     Person.find({}).then(results => {
-        console.log(results)
         response.json(results)
     })
 })
@@ -57,7 +33,7 @@ app.get('/api/persons/:idx', (request, response) => {
     .catch(err => next(err))
 })
 
-app.put('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
     const index = request.params.id
     const body = request.body
     console.log(body)
@@ -65,7 +41,7 @@ app.put('/api/persons/:id', (request, response) => {
         name: body.name,
         number: body.number,
     }
-    Person.findByIdAndUpdate(index, newPerson, { new: true})
+    Person.findByIdAndUpdate(index, newPerson, { new: true, runValidators: true})
         .then(nPerson => {
             response.json(nPerson)
         })
@@ -93,11 +69,8 @@ const rand_id = () => {
     return Math.floor(Math.random() * 1000)
 }
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const data = request.body
-    if(!data.name || !data.number){
-        return response.status(400).end()
-    }
     const person = new Person({
         name: data.name,
         number: data.number
@@ -105,13 +78,15 @@ app.post('/api/persons', (request, response) => {
     person.save().then(nPerson => {
         response.json(nPerson)
     })
+    .catch(err => next(err))
 })
 
 const errorHandler = (error, request, response, next) => {
-    console.error(error.message)
-  
     if(error.name === 'CastError'){
-      return response.status(400).send({ error: 'Bad ID'})
+        return response.status(400).send({ error: 'Bad ID'})
+    }
+    else if(error.name === 'ValidationError'){
+        return response.status(400).send({ error: error.message})
     }
   }
 

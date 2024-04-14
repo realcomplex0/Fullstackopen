@@ -39,8 +39,8 @@ export const PersonForm = ({persons, setPersons, setNotification}) => {
             setNewName('')
             setNewNumber('')
           })
-          .catch(error => {
-            setNotification({message: `Information about ${newName} is already removed from the server`, type: 'error'});
+          .catch((error) => {
+            setNotification({message: error.response.data.error, type: 'error'});
           })
         }
       }
@@ -55,11 +55,13 @@ export const PersonForm = ({persons, setPersons, setNotification}) => {
         .addPerson(newPerson)
         .then(res => {
           setPersons(persons.concat(res))
-          console.log('hello mister')
           setNotification({message: `${res.name} has been added to the phonebook`, type: 'success'})
           setNewName('')
           setNewNumber('')
           setTimeout(() => setNotification(), 5000)
+        })
+        .catch(error => {
+          setNotification({message: error.response.data.error, type: 'error'})
         })
       }
     }
