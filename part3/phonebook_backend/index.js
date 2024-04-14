@@ -15,7 +15,9 @@ morgan.token('body', (request, response) => {
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 app.get('/api/persons', (request, response) => {
+    console.log("Call api/persons");
     Person.find({}).then(results => {
+        console.log('Received', results)
         response.json(results)
     })
 })
