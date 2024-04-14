@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "deploy:full": "rm -rf dist && npm i && cd ../../part2/phonebook && npm i && npm run build && cp -r dist ../../part3/phonebook_backend",
+    "deploy:full": "rm -rf dist && npm i && cd ../phonebook && npm i && npm run build && cp -r dist ../phonebook_backend",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "me",
