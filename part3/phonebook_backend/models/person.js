@@ -7,12 +7,12 @@ console.log('got url', url)
 mongoose.set('strictQuery', false)
 mongoose.connect(url)
 
-.then(result => {
+  .then(result => {
     console.log('connected to MongoDB')
-})
-.catch(err => {
+  })
+  .catch(err => {
     console.log('couldnt connect:', err.message)
-})
+  })
 const personSchema = new mongoose.Schema({
   name: {
     type: String,
