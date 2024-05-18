@@ -12,9 +12,13 @@ const unknownEndpoint = (request, response) => {
     response.status(404).send({error : 'bad path'})
 }
 
-const errorHandler = (request, response, error, next) => {
-    logger.error(error.message)
-    response.status(500).send({error : "Internal server error"})
+const errorHandler = (error, request, response, next) => {
+    if(error.name === 'ValidationError') {
+        response.status(400).send({error : "Bad request"})
+    }
+    else{
+        response.status(500).send({error : "Internal server error"})
+    }
     next(err)
 }
 
